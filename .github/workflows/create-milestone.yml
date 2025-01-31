@@ -18,3 +18,13 @@ jobs:
           return label ? 'true' : 'false';
     - name: show label
       run: echo ${{ steps.check_label.outputs.result }}
+    - name: Create milestone
+      if: steps.check_label.outputs.result == 'true'
+      run: |
+        echo "Creating milestone"
+        gh api \
+        --method POST \
+        -H "Accept: application/vnd.github+json" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        /repos/nt240/github-actions/milestones \
+        -f "title=${{ github.event.issue.title }}"-f "description=${{ github.event.issue.user.html_url }}""
