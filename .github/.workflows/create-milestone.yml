@@ -1,0 +1,34 @@
+name: Create Milestone
+
+on:
+  issues:
+    types: [opened,labeled]
+
+jobs:
+  create_milestone:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check if issue has milestone label
+      id: check_label
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const label = context.payload.issue.labels.find(label => label.name === 'milestone');
+          return label ? 'true' : 'false';
+
+    - name: Create milestone
+      if: steps.check_label.outputs.result == 'true'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const issue = context.payload.issue;
+          const milestoneTitle = issue.title;
+          const { data: milestone } = await github.rest.issues.createMilestone({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: milestoneTitle,
+            state: 'open',
+            description: `Milestone for issue #${issue.number}`
+          });
+          core.setOutput('milestone_number', milestone.number);
