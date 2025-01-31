@@ -19,7 +19,6 @@ jobs:
     - name: show label
       run: echo ${{ steps.check_label.outputs.result }}
     - name: Create milestone
-      if: steps.check_label.outputs.result == 'true'
       run: |
         echo "Creating milestone"
         gh api \
